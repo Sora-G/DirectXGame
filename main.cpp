@@ -29,17 +29,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 }
 
 
-//出力ウィンドウに文字を出す
-void Log(const std::string& message)
-{
-	OutputDebugStringA(message.c_str());
-}
-
-//void Log(const std::wstring& message)
-//{
-//	OutputDebugStringA(ConvertString(message).c_str());
-//}
-
 //string->wstringに変換する関数
 std::wstring ConvertString(const std::string& str) {
 	if (str.empty()) {
@@ -54,7 +43,6 @@ std::wstring ConvertString(const std::string& str) {
 	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
 	return result;
 }
-
 
 //wstring->stringに変換する関数
 std::string ConvertString(const std::wstring& str) {
@@ -71,6 +59,17 @@ std::string ConvertString(const std::wstring& str) {
 	return result;
 }
 
+
+//出力ウィンドウに文字を出す
+void Log(const std::string& message)
+{
+	OutputDebugStringA(message.c_str());
+}
+
+void Log(const std::wstring& message)
+{
+	OutputDebugStringA(ConvertString(message).c_str());
+}
 
 
 //Windowsアプリでのエントリーポイント(main関数)
@@ -136,7 +135,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	assert(SUCCEEDED(hr));
 
 
+	//使用するアダプタ用の変数　最初にnullptrを代入しておく
+	IDXGIAdapter4* useAdapter = nullptr;
+
+	//良い順にアダプタを頼む
+	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(
+		i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
+		IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; ++i)
+	{
+		//アダプタの情報を取得する
+		DXGI_ADAPTER_DESC3 adapterDesc{};
+		hr = useAdapter->GetDesc3(&adapterDesc);
+		assert(SUCCEEDED(hr));//取得できないのは一大事
+		//ソフトウェアアダプタでなければ採用！
+		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
+		{
+			//採用したアダプタの情報をログに出力　wstringの方なので注意
+			Log(std::format(L"Use Adapter:{}\n", adapterDesc.Description));
+			break;
+		}
+		useAdapter = nullptr;//ソフトウェアアダプタの場合は見なかったことにする
+	}
+	//適切なアダプタが見つからなかったので起動できない
+	assert(useAdapter != nullptr);
+
+
 	MSG msg{};
+
 	//ウィンドウの×が押されるまでループ
 	while (msg.message != WM_QUIT)
 	{
