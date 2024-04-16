@@ -168,7 +168,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	};
 	const char* featureLevelStrings[] = { "12.2","12.1","12.0" };
 	//高い順に生成できるか試していく
-	for (size_t i = 0; i < _countof(featureLevels[i]); ++i)
+	for (size_t i = 0; i < _countof(featureLevels); ++i)
 	{
 		//採用したアダプタでデバイスを生成
 		hr = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
