@@ -1,31 +1,51 @@
-#include <Windows.h>
+﻿#include <Windows.h>
 
 
 
-//�E�B���h�E�v���[�W��
+//ウィンドウプロージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	//���b�Z�[�W�ɉ����ăQ�[���̌ŗL�������s��
+	//メッセージに応じてゲームの固有処理を行う
 	switch (msg)
 	{
-		//�E�B���h�E�j�����ꂽ
+		//ウィンドウ破棄された
 	case WM_DESTROY:
-		//OS�ɑ΂��ăA�v���̏I����`����
+		//OSに対してアプリの終了を伝える
 		PostQuitMessage(0);
 		return 0;
 	}
 
-	//�W���̃��b�Z�[�W�������s��
+	//標準のメッセージ処理を行う
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
 
 
-//Windows�A�v���ł̃G���g���[�|�C���g(main�֐�)
+//Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) 
 {
+	WNDCLASS wc{};
 
-	//�o�̓E�B���h�E�ւ̕����o��
+	//ウィンドウプロージャ
+	wc.lpfnWndProc = WindowProc;
+
+	//ウィンドウクラス名(何でもいい)
+	wc.lpszClassName = L"CG2WindowClass";
+
+	//インスタンスバンドル
+	wc.hInstance = GetModuleHandle(nullptr);
+
+	//カーソル
+	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+
+
+	//ウィンドウクラスを登録する
+	RegisterClass(&wc);
+
+
+
+
+	//出力ウィンドウへの文字出力
 	OutputDebugStringA("Hello DirectX!\n");
 
 	return 0;
