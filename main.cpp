@@ -1,6 +1,7 @@
 ﻿#include <Windows.h>
 #include <cstdint>
 #include <string>
+#include <format>
 
 
 //ウィンドウプロージャ
@@ -20,11 +21,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+
 //出力ウィンドウに文字を出す
 void Log(const std::string& message)
 {
 	OutputDebugStringA(message.c_str());
 }
+
 
 
 //Windowsアプリでのエントリーポイント(main関数)
