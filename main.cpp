@@ -35,6 +35,10 @@ void Log(const std::string& message)
 	OutputDebugStringA(message.c_str());
 }
 
+//void Log(const std::wstring& message)
+//{
+//	OutputDebugStringA(ConvertString(message).c_str());
+//}
 
 //string->wstringに変換する関数
 std::wstring ConvertString(const std::string& str) {
@@ -118,6 +122,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//ウィンドウの表示
 	ShowWindow(hwnd, SW_SHOW);
+
+
+	//DXGIファクトリーの生成
+	IDXGIFactory7* dxgiFactory = nullptr;
+
+	//HRESULTはWindows系のエラーコードであり
+	//関数が成功したかどうかをSUCCEEDEDマクロで判定できる
+	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+
+	//初期化の根本的な部分でエラーが出た場合はコードが間違っているか
+	//どうにもできない場合が多いのでassertにしておく
+	assert(SUCCEEDED(hr));
 
 
 	MSG msg{};
