@@ -1,5 +1,5 @@
 ﻿#include <Windows.h>
-
+#include <cstdint>
 
 
 //ウィンドウプロージャ
@@ -43,6 +43,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	RegisterClass(&wc);
 
 
+	//クライアント領域のサイズ
+	const int32_t kClientWidth = 1280;
+	const int32_t kClientHeight = 720;
+
+	//ウィンドウサイズを表す構造体にクライアント領域を入れる
+	RECT wrc = { 0,0,kClientWidth, kClientHeight };
+
+	//クライアント領域を基に実際のサイズにwrcを変更してもらう
+	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 
 	//出力ウィンドウへの文字出力
