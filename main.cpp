@@ -2,6 +2,13 @@
 #include <cstdint>
 #include <string>
 #include <format>
+#include <d3d12.h>
+#include <dxgi1_6.h>
+#include <cassert>
+
+//libのリンク
+#pragma comment(lib,"d3d12.lib")
+#pragma comment(lib,"dxgi.lib")
 
 
 //ウィンドウプロージャ
