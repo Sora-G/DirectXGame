@@ -54,6 +54,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 
+	//ウィンドウの生成
+	HWND hwnd = CreateWindow(
+		wc.lpszClassName,
+		L"CG2",
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		wrc.right - wrc.left,
+		wrc.bottom - wrc.top,
+		nullptr,
+		nullptr,
+		wc.hInstance,
+		nullptr);
+
+	//ウィンドウの表示
+	ShowWindow(hwnd, SW_SHOW);
+
+
 	//出力ウィンドウへの文字出力
 	OutputDebugStringA("Hello DirectX!\n");
 
