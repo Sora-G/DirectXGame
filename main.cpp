@@ -29,7 +29,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ウィンドウプロージャ
 	wc.lpfnWndProc = WindowProc;
 
-	//ウィンドウクラス名(何でもいい)
+	//ウィンドウクラス名(なんでもいい)
 	wc.lpszClassName = L"CG2WindowClass";
 
 	//インスタンスバンドル
@@ -56,17 +56,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//ウィンドウの生成
 	HWND hwnd = CreateWindow(
-		wc.lpszClassName,
-		L"CG2",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		wrc.right - wrc.left,
-		wrc.bottom - wrc.top,
-		nullptr,
-		nullptr,
-		wc.hInstance,
-		nullptr);
+		wc.lpszClassName,		//利用するクラス名
+		L"CG2",					//タイトルバーの文字(なんでもいい)
+		WS_OVERLAPPEDWINDOW,	//よく見るウィンドウスタイル
+		CW_USEDEFAULT,			//表示X座標(Windousに任せる)
+		CW_USEDEFAULT,			//表示Y座標(WindousOSに任せる)
+		wrc.right - wrc.left,	//ウィンドウの横幅
+		wrc.bottom - wrc.top,	//ウィンドウの立幅
+		nullptr,				//親ウィンドウバンドル
+		nullptr,				//メニューバンドル
+		wc.hInstance,			//インスタンスバンドル
+		nullptr);				//オプション
 
 	//ウィンドウの表示
 	ShowWindow(hwnd, SW_SHOW);
