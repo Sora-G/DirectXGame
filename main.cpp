@@ -122,7 +122,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #ifdef DEBUG
 
 	ID3D12Debug1* debugController = nullptr;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) 
+	{
 		//デバッグレイヤーを有効化する
 		debugContoroller->EnableDebugLayer();
 		//さらにGPU側でもチェックを行うようにする
@@ -197,6 +198,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//デバイスの生成が上手くいかなかったので起動できない
 	assert(device != nullptr);
 	Log("Comprete Create D3D12Device!\n");
+
+
+#ifdef DEBUG
+
+	ID3D12InfoQueue* infoQueue = nullptr;
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
+	{
+		//ヤバいエラー時に止まる
+		infoQueue->SetBreakOnServerity(D3D12_MESSAGE_SERVERITY_CORRUPTION, true);
+		//エラー時に止まる
+		infoQueue->SetBreakOnServerity(D3D12_MESSAGE_SERVERITY_ERROR, true);
+		//警告時に止まる
+		infoQueue->SetBreakOnServerity(D3D12_MESSAGE_SERVERITY_WARNING, true);
+		//解放
+		infoQueue->Release();
+
+	}
+
+#endif // DEBUG
+
 
 
 	//コマンドキューを生成する
