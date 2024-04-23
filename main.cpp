@@ -214,6 +214,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//解放
 		infoQueue->Release();
 
+		//抑制するメッセージのID
+		D3D12_MESSAGE_ID denyIds[] =
+		{
+			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
+		};
+
+		//抑制するレベル
+		D3D12_MESSAGE_SEVERITY severities[] = { D3D12_MESSAGE_SEVERITY_INFO };
+		D3D12_INFO_QUEUE_FILTER filter{};
+		filter.DenyList.NumIDs = _countof(denyIDs);
+		filter.DenyList.pIDList = denyIDs;
+		filter.DenyList.NumSeverities = _countof(severities);
+		filter.DenyList.pSeverityList = severities;
+		//指定したメッセージの表示を抑制する
+		infoQueue->PushStorageFilter(&filter);
 	}
 
 #endif // DEBUG
@@ -331,6 +346,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		else
 		{
 			///↓-------ゲームの処理-------↓
+
 
 
 
