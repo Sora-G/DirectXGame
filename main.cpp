@@ -221,6 +221,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
 	assert(SUCCEEDED(hr));
 
+
 	//ディスクリプタヒープを生成する
 	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
@@ -229,6 +230,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
 	//ディスクリプタヒープが作れなかったので起動できない
 	assert(SUCCEEDED(hr));
+
+
+	//SwapChainからResourceを引っ張ってくる
+	ID3D12Resource* swapChainResources[2] = { nullptr };
+	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
+	//上手く取得できなければ起動できない
+	assert(SUCCEEDED(hr));
+	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
+	assert(SUCCEEDED(hr));
+
+
+	
+
 
 
 
