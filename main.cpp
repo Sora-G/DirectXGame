@@ -119,6 +119,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		wc.hInstance,			//インスタンスバンドル
 		nullptr);				//オプション
 
+#ifdef DEBUG
+
+	ID3D12Debug1* debugController = nullptr;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+		//デバッグレイヤーを有効化する
+		debugContoroller->EnableDebugLayer();
+		//さらにGPU側でもチェックを行うようにする
+		debugContoroller->SetEnableGPUBasedValidation(TRUE);
+	}
+
+#endif // DEBUG
+
+
 	//ウィンドウの表示
 	ShowWindow(hwnd, SW_SHOW);
 
