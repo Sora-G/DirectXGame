@@ -5,10 +5,12 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <cassert>
+#include <dxgidebug.h>
 
 //libのリンク
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
+#pragma comment(lib,"dxguid.lib")
 
 
 //ウィンドウプロージャ
@@ -419,9 +421,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 	}
 
+	//リソースリークチェック
+	IDXGIDebug1* debug;
+	if (SUCCEEDED(DXGIGetDebugInterface(0, IID_PPV_ARGS(&debug))))
+	{
 
-	//出力ウィンドウへの文字出力
-	OutputDebugStringA("Hello DirectX!\n");
+	}
+
 
 	return 0;
 }
