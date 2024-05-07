@@ -352,14 +352,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	commandQueue->ExecuteCommandLists(1, commandLists);
 	//GPUとOSに画面の交換を行うよう通知する
 	swapChain->Present(1, 0);
+
+
 	//次のフレーム用のコマンドリストを準備
 	hr = commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
 
-
-	MSG msg{};
 
 	//初期値0でFenceを作る
 	ID3D12Fence* fence = nullptr;
@@ -370,6 +370,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//fenceのsignalを待つためのイベントを作成する
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
+
+
+	MSG msg{};
 
 
 	//ウィンドウの×が押されるまでループ
@@ -384,6 +387,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		else
 		{
 			///↓-------ゲームの処理-------↓
+
+			//fenceの値を更新
+			fenceValue++;
+			//GPUがここまでたどり着いたときに、fenceの値を指定した値に代入するようにsignalを送る
+			commandQueue->Signal(fence, fenceValue);
+
+			//fenceの値が指定したsignal値にたどり着いているか確認する
+			//GetCompletedValueの初期値はfence作成時に渡した初期値
+			if (fence->GetCompletedValue())
+			{
+				//指定したsignalにたどりついていないので、たどりつくまで待つようにイベントを設定する
+				fence->SetEventOnCompletion(fenceValue, fenceEvent);
+				//イベントを待つ
+				WaitForSingleObject(fenceEvent, INFINITE);
+			}
+
+
+
+
+
+
+
+
 
 
 
