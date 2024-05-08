@@ -102,7 +102,28 @@ IDxcBlob* CompileShader
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
 
-
+	//2.Compileする
+	LPCWSTR arguments[] =
+	{
+		filePath.c_str(),		//コンパイル対象のhlsl名
+		L"-E",L"main",			//エントリーポイントの指定、基本的にmain以外にはしない
+		L"-T",profile,			//ShaderProfileの設定
+		L"-Zi",L"-Qembed_debug",//デバッグ用の情報を埋め込む
+		L"-Od",					//最適化を外しておく
+		L"-Zpr",				//メモリレイアウトは行優先
+	};
+	//実際にshaderをコンパイルする
+	IDxcResult* shaderResult = nullptr;
+	hr = dxcCompiler->Compile
+	(
+		&shaderSourceBuffer,		//読み込んだファイル
+		arguments,					//コンパイルオプション
+		_countof(arguments),		//コンパイルオプションの数
+		includeHandler,				//includeが含まれた諸々
+		IID_PPV_ARGS(&shaderResult)	//コンパイル結果
+	);
+	//コンパイルエラーではなくdxcが起動できないなど致命的な状況
+	assert(SUCCEEDED(hr));
 }
 
 
