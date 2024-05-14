@@ -135,8 +135,20 @@ IDxcBlob* CompileShader
 		//警告・エラーダメ！
 		assert(false);
 	}
-}
 
+	//4.compile結果を受け取って返す
+	//コンパイル結果から実行用のバイナリ部分を取得
+	IDxcBlob* shaderBlob = nullptr;
+	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	assert(SUCCEEDED(hr));
+	//成功したログを出す
+	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	//もう使わないリソースを解放
+	shaderSource->Release();
+	shaderResult->Release();
+	//実行用のバイナリを返却
+	return shaderBlob;
+}
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) 
@@ -158,7 +170,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//ウィンドウクラスを登録する
 	RegisterClass(&wc);
-
+	
 
 	//クライアント領域のサイズ
 	const int32_t kClientWidth = 1280;
@@ -397,6 +409,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	IDxcIncludeHandler* includeHandler = nullptr;
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr));
+
+
+	//Rootsignatureを作成
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	descriptionRootSignature.Flags =
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//シリアライズしてバイナリにする
+	ID3DBlob* signatureBlob = nullptr;
+	ID3DBlob* errorBlob = nullptr;
+	hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr))
+	{
+		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+	//バイナリの作成
+	ID3D12RootSignature* rootSignature = nullptr;
+	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	assert(SUCCEEDED(hr));
+
+
+
+
 
 
 	MSG msg{};
