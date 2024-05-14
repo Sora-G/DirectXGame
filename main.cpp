@@ -15,6 +15,16 @@
 #pragma comment(lib,"dxcompiler.lib")
 
 
+//vecto4構造体
+typedef struct Vector4
+{
+	float x;
+	float y;
+	float z;
+	float w;
+}Vector4;
+
+
 //ウィンドウプロージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -507,6 +517,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr, IID_PPV_ARGS(&vertexResource));
 	assert(SUCCEEDED(hr));
 
+
+	//頂点バッファービューを生成
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	//リソースの先頭のアドレスを使う
+	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	//使用するリソースのサイズは頂点３つ分のサイズ
+	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
+	//１頂点あたりのサイズ
+	vertexBufferView.StrideInBytes = sizeof(Vector4);
+
+
+	//頂点リソースにデータを書き込む
+	Vector4* vertexData = nullptr;
+	//書き込む為のアドレス取得
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//左下
+	vertexData[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+	//上
+	vertexData[1] = { 0.0f, 0.5f, 0.0f, 1.0f };
+	//右下
+	vertexData[2] = { 0.5f, -0.5f, 0.0f, 1.0f };
 
 
 
