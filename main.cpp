@@ -600,6 +600,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };
 			commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
+
+
+			commandList->RSSetViewports(1, &viewport);
+			commandList->RSSetScissorRects(1, &scissorRect);
+			//RootSignatureを設定　PSOに設定しているけど別途設定が必要
+			commandList->SetGraphicsRootSignature(rootSignature);
+			commandList->SetPipelineState(graphicsPipelineState);
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+			//形状の設定　PSOに設定しているものとは別　同じものを設定すると考えておけばいい
+			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			//描画(DrawCall/ドローコール)３頂点で１つのインスタンス
+			commandList->DrawInstanced(3, 1, 0, 0);
+
+
+
 			//画面に描画する処理は全て終わり、画面に映すので、状態を遷移
 			//今回はRenderTargetからPresent
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -657,6 +672,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	device->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
+
+	vertexResource->Release();
+	graphicsPipelineState->Release();
+	signatureBlob->Release();
+	if (errorBlob)
+	{
+		errorBlob->Release();
+	}
+	rootSignature->Release();
+	pixelShaderBlob->Release();
+	vertexShaderBlob->Release();
+
+
 #ifdef _DEBUG
 	debugController->Release();
 #endif // _DEBUG
