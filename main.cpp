@@ -441,6 +441,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
 
+	//BlendStateの設定
+	D3D12_BLEND_DESC blendDesc{};
+	//全ての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+
 
 	MSG msg{};
 
