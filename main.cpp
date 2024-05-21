@@ -555,7 +555,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	assert(SUCCEEDED(hr));
 
 
-
+	//マテリアル用のリソースを作る　今回はcolor１つ分のサイズを用意する
+	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4));
+	//マテリアルにデータを読み込む
+	Vector4* materialDeta = nullptr;
+	//書き込むためのアドレスを取得
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialDeta));
+	//今回は赤を書き込んでみる
+	*materialDeta = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
 
 
