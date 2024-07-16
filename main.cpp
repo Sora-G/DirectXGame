@@ -11,6 +11,7 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/DirectXTex/DirectXTex.h"
+#include "Matrix.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -43,25 +44,13 @@ struct VertexData
 	Vector2 texcord;
 };
 
-struct  Matrix4x4
+struct Transform
 {
-	float m[4][4];
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
 };
 
-Matrix4x4 MakeIdentity4x4()
-{
-	Matrix4x4 result;
-
-	result =
-	{
-		1.0f,0.0f,0.0f,0.0f,
-		0.0f,1.0f,0.0f,0.0f,
-		1.0f,0.0f,1.0f,0.0f,
-		0.0f,0.0f,0.0f,1.0f,
-	};
-
-	return result;
-}
 
 //ウィンドウプロージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -618,6 +607,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
+
 	//WVP用のリソースを作る
 	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
 	//データを書き込む
@@ -626,6 +616,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 	//単位行列を書き込んでおく
 	*wvpData = MakeIdentity4x4();
+
 
 	//シリアライズしてバイナリにする
 	ID3DBlob* signatureBlob = nullptr;
@@ -821,6 +812,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 
 
+	//Transform変数の作成
+	Transform transform = { {1.0f,1.0f,1.0f},{0.0f,10.0f,0.0f},{0.0f,0.0f,0.0f} };
+
 	MSG msg{};
 
 
@@ -884,7 +878,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//ImGuiの内部コマンドを生成する
 			ImGui::Render();
 
-
+			transform.rotate.y += 0.1f;
+			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+			*wvpData = worldMatrix;
 
 			///-----描画処理-----
 
@@ -902,7 +898,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			//wvp用のCBufferの場所設定
 			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-
 
 			//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
 			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
