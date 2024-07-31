@@ -59,6 +59,17 @@ struct ModelData
 	std::vector<VertexData> vertices;
 };
 
+struct MaterialData
+{
+	std::string textureFilePath;
+};
+
+struct ModelData
+{
+	std::vector<VertexData>vertices;
+	MaterialData material;
+};
+
 //ウィンドウプロージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -412,18 +423,57 @@ ModelData LoadObjData(const std::string& directoryPath, const std::string& fileN
 				//modeldata.vertices.push_back(vertex);
 				position.x *= -1.0f;
 				normal.x *= -1.0f;
+				//texture座標の原点
+				texcoord.y = 1.0f - texcoord.y;
 				triangle[faceVertex] = { position, texcoord, normal };
 			}
-
 			//頂点を逆算することで、回り順を逆にする
 			modeldata.vertices.push_back(triangle[2]);
 			modeldata.vertices.push_back(triangle[1]);
 			modeldata.vertices.push_back(triangle[0]);
 		}
+		else if (identifier == "mtllib")//obj読み来みにmaterial読み来みを追加
+		{
+			//MaterialTemplateLibralyファイルの名前を取得する
+			std::string materialFilename;
+			s >> materialFilename;
+			//基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
+			modeldata.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
+		}
 	}
 
 	//4ModelDataを返す
 	return modeldata;
+}
+
+MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+{
+	//1.中で必要となる変数の宣言
+	//2.ファイルを開く
+	MaterialData materialData;//構築するMaterialData
+	std::string line;//ファイルから読んだ1行を格納するもの
+	std::ifstream file(directoryPath + "/" + filename);//ファイルを開く
+	assert(file.is_open());//開けなかったら止める
+
+	//3.実際にファイルを読み、MaterialDataを構築していく
+	while (std::getline(file, line))
+	{
+		std::string identifer;
+		std::istringstream s(line);
+		s >> identifer;
+
+		//identiferに応じた処理
+		if (identifer == "map_kd")
+		{
+			std::string textureFileName;
+			s >> textureFileName;
+			//連結してファイルパスにする
+			materialData.textureFilePath = directoryPath + "/" + textureFileName;
+		}
+	}
+	
+	//4.MaterialDataを返す
+	return materialData;
 }
 
 
@@ -1042,6 +1092,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
 	UploadTextureData(textureResource, mipImages);
 
+	//textureを指定されたものにする
+	DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
 
 	//metaDataを基にSRVの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
