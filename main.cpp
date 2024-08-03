@@ -54,11 +54,6 @@ struct Transform
 	Vector3 translate;
 };
 
-struct ModelData
-{
-	std::vector<VertexData> vertices;
-};
-
 struct MaterialData
 {
 	std::string textureFilePath;
@@ -356,6 +351,35 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 	return resource;
 }
 
+MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+{
+	//1.中で必要となる変数の宣言
+	//2.ファイルを開く
+	MaterialData materialData;//構築するMaterialData
+	std::string line;//ファイルから読んだ1行を格納するもの
+	std::ifstream file(directoryPath + "/" + filename);//ファイルを開く
+	assert(file.is_open());//開けなかったら止める
+
+	//3.実際にファイルを読み、MaterialDataを構築していく
+	while (std::getline(file, line))
+	{
+		std::string identifer;
+		std::istringstream s(line);
+		s >> identifer;
+
+		//identiferに応じた処理
+		if (identifer == "map_kd")
+		{
+			std::string textureFileName;
+			s >> textureFileName;
+			//連結してファイルパスにする
+			materialData.textureFilePath = directoryPath + "/" + textureFileName;
+		}
+	}
+
+	//4.MaterialDataを返す
+	return materialData;
+}
 
 ModelData LoadObjData(const std::string& directoryPath, const std::string& fileName)
 {
@@ -444,36 +468,6 @@ ModelData LoadObjData(const std::string& directoryPath, const std::string& fileN
 
 	//4ModelDataを返す
 	return modeldata;
-}
-
-MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
-{
-	//1.中で必要となる変数の宣言
-	//2.ファイルを開く
-	MaterialData materialData;//構築するMaterialData
-	std::string line;//ファイルから読んだ1行を格納するもの
-	std::ifstream file(directoryPath + "/" + filename);//ファイルを開く
-	assert(file.is_open());//開けなかったら止める
-
-	//3.実際にファイルを読み、MaterialDataを構築していく
-	while (std::getline(file, line))
-	{
-		std::string identifer;
-		std::istringstream s(line);
-		s >> identifer;
-
-		//identiferに応じた処理
-		if (identifer == "map_kd")
-		{
-			std::string textureFileName;
-			s >> textureFileName;
-			//連結してファイルパスにする
-			materialData.textureFilePath = directoryPath + "/" + textureFileName;
-		}
-	}
-	
-	//4.MaterialDataを返す
-	return materialData;
 }
 
 
