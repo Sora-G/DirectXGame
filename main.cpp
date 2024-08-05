@@ -883,7 +883,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
 
-	//DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
+	DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
 
 	//頂点リソースの設定
 	D3D12_RESOURCE_DESC vertexResourceDesc{};
@@ -1106,8 +1106,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			ImGui::Begin("Window");
 			ImGui::ColorEdit3("color", &materialData->x);
+			ImGui::DragFloat3("rotateSprite", &transformSprite.rotate.x, 1.0f);
 			ImGui::DragFloat3("translationSprite", &transformSprite.translate.x, 1.0f);
-			ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
+			ImGui::DragFloat3("rotateScale", &transformSprite.scale.x, 1.0f);
+			ImGui::DragFloat3("rotateModel", &transform.rotate.x, 0.01f);
+			ImGui::DragFloat3("transformModel", &transform.translate.x, 0.01f);
+			ImGui::DragFloat3("scaleModel", &transform.scale.x, 0.01f);
 
 			ImGui::End();
 
