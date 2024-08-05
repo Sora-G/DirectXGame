@@ -368,7 +368,7 @@ MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const st
 		s >> identifer;
 
 		//identiferに応じた処理
-		if (identifer == "map_kd")
+		if (identifer == "map_Kd")
 		{
 			std::string textureFileName;
 			s >> textureFileName;
@@ -1145,7 +1145,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::Begin("Window");
 			ImGui::DragFloat3("color", &materialData->x, 0.01f);
 			ImGui::DragFloat3("translationSprite", &transformSprite.translate.x, 1.0f);
-			ImGui::DragFloat3("rotateSprite", &transform.rotate.x, 1.0f);
+			ImGui::DragFloat3("rotateSprite", &transform.rotate.y, 1.0f);
 
 			ImGui::End();
 
