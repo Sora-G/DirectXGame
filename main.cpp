@@ -433,7 +433,7 @@ ModelData LoadObjData(const std::string& directoryPath, const std::string& fileN
 				//頂点要素のIndexは「位置/UV/法線」で格納されているので、分解してIndexを取得する
 				std::istringstream v(vertexDefinition);
 				uint32_t elementIndices[3];
-				for (uint32_t element = 0; element < 3; ++element)
+				for (uint32_t element = 0; element < 3; element++)
 				{
 					std::string index;
 					std::getline(v, index, '/');//区切りでインデックスを読んでいく
@@ -443,12 +443,13 @@ ModelData LoadObjData(const std::string& directoryPath, const std::string& fileN
 				Vector4 position = positions[elementIndices[0] - 1];
 				Vector2 texcoord = texcoords[elementIndices[0] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
-				//VertexData vertex = { position, texcoord, normal };
-				//modeldata.vertices.push_back(vertex);
 				position.x *= -1.0f;
 				normal.x *= -1.0f;
 				//texture座標の原点
 				texcoord.y = 1.0f - texcoord.y;
+				VertexData vertex = { position, texcoord, normal };
+				modeldata.vertices.push_back(vertex);
+
 				triangle[faceVertex] = { position, texcoord, normal };
 			}
 			//頂点を逆算することで、回り順を逆にする
@@ -1107,7 +1108,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 
 	//Transform変数の作成
-	Transform transform = { {1.0f,1.0f,1.0f},{0.0f,10.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Transform transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform transformSprite{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 
 	//camera変数の作成
@@ -1145,7 +1146,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::Begin("Window");
 			ImGui::DragFloat3("color", &materialData->x, 0.01f);
 			ImGui::DragFloat3("translationSprite", &transformSprite.translate.x, 1.0f);
-			ImGui::DragFloat3("rotateSprite", &transform.rotate.y, 1.0f);
+			ImGui::DragFloat3("rotateSprite", &transform.rotate.x, 0.05f);
 
 			ImGui::End();
 
